@@ -851,12 +851,12 @@
 		// If user is in PWA mode, remove the scroll ability
 		if (window.matchMedia("(display-mode: standalone)").matches) {
 			window.addEventListener("scroll", (e) => {
-				e.preventDefault();
-				window.scrollTo(0, 0);
+				// e.preventDefault();
+				// window.scrollTo(0, 0);
 			});
 
 			const body = document.querySelector("body");
-			body.classList.add("fixed-body");
+			// body.classList.add("fixed-body");
 		}
 	</script>
 </html>
