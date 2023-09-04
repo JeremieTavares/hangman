@@ -285,6 +285,15 @@
 				align-items: center;
 			}
 
+			.response-color {
+				color: #055252;
+			}
+
+			.response-was-container {
+				width: 100%;
+				text-align: center;
+			}
+
 			@keyframes hm-head-height {
 				from {
 					height: 0px;
@@ -364,6 +373,11 @@
 		</div>
 		<section>
 			<h1>Hangman</h1>
+			<div class="d-none response-was-container">
+				<h2 class="response-color">The response was:</h2>
+				<h2 class="response-color"></h2>
+			</div>
+
 			<div>
 				<button type="button" class="btn-try-again" id="btn-try-again">Next Word</button>
 			</div>
@@ -430,91 +444,91 @@
 				"gorille",
 				"girafe",
 				"crocodile",
-				"hippopotame",
-				"rhinocéros",
-				"pomme",
-				"avion",
-				"bateau",
-				"enfant",
-				"voiture",
-				"complotiste",
-				"recette",
-				"voyage",
-				"programmation",
-				"quantique",
-				"processeur",
-				"cerveau",
-				"jambes",
-				"bras",
-				"yeux",
-				"nez",
-				"bouche",
-				"oreilles",
-				"cheveux",
-				"doigts",
-				"orteils",
-				"pieds",
-				"mains",
-				"ordinateur",
-				"souris",
-				"clavier",
-				"tablette",
-				"smartphone",
-				"chaise",
-				"table",
-				"bureau",
-				"maison",
-				"appartement",
-				"immeuble",
-				"piscine",
-				"jardin",
-				"parc",
-				"foret",
-				"montagne",
-				"mer",
-				"ocean",
-				"lac",
-				"rivière",
-				"adverbe",
-				"adjectif",
-				"verbe",
-				"nom",
-				"pronom",
-				"conjonction",
-				"interjection",
-				"article",
-				"phrase",
-				"syntagme",
-				"groupe",
-				"sujet",
-				"pont",
-				"route",
-				"autoroute",
-				"chemin",
-				"rue",
-				"avenue",
-				"boulevard",
-				"impasse",
-				"personne",
-				"pourquoi",
-				"pourtant",
-				"cours",
-				"cave",
-				"grenier",
-				"toit",
-				"aviateur",
-				"aile",
-				"pale",
-				"helice",
-				"mur",
-				"plafond",
-				"police",
-				"pompier",
-				"sol",
-				"escalier",
-				"ascenseur",
-				"porte",
-				"volet",
+				// "hippopotame",
+				// "rhinoceros",
+				// "pomme",
+				// "avion",
+				// "bateau",
+				// "enfant",
+				// "voiture",
+				// "complotiste",
+				// "recette",
+				// "voyage",
+				// "programmation",
+				// "quantique",
+				// "processeur",
+				// "cerveau",
+				// "jambes",
+				// "bras",
+				// "yeux",
+				// "nez",
+				// "bouche",
+				// "oreilles",
+				// "cheveux",
+				// "doigts",
+				// "orteils",
+				// "pieds",
+				// "mains",
+				// "ordinateur",
+				// "souris",
+				// "clavier",
+				// "tablette",
+				// "smartphone",
+				// "chaise",
+				// "table",
+				// "bureau",
+				// "maison",
+				// "appartement",
+				// "immeuble",
+				// "piscine",
+				// "jardin",
+				// "parc",
+				// "foret",
+				// "montagne",
+				// "mer",
+				// "ocean",
+				// "lac",
+				// "rivière",
+				// "adverbe",
+				// "adjectif",
+				// "verbe",
+				// "nom",
+				// "pronom",
+				// "conjonction",
+				// "interjection",
+				// "article",
+				// "phrase",
+				// "syntagme",
+				// "groupe",
+				// "sujet",
+				// "pont",
+				// "route",
+				// "autoroute",
+				// "chemin",
+				// "rue",
+				// "avenue",
+				// "boulevard",
+				// "impasse",
+				// "personne",
+				// "pourquoi",
+				// "pourtant",
+				// "cours",
+				// "cave",
+				// "grenier",
+				// "toit",
+				// "aviateur",
+				// "aile",
+				// "pale",
+				// "helice",
+				// "mur",
+				// "plafond",
+				// "police",
+				// "pompier",
+				// "sol",
+				// "escalier",
+				// "ascenseur",
+				// "porte",
+				// "volet",
 			];
 
 			const randomWord = wordList[Math.floor(Math.random() * wordList.length)];
@@ -584,16 +598,21 @@
 			}, 500);
 		};
 
-		const handleInvalidChoice = () => {
+		const handleInvalidChoice = (word) => {
+			console.log(word);
 			const hangManBodyPart = document.querySelectorAll(".hangman-container span.d-none");
 			const resultTitle = document.querySelector("#result-pop-up");
 			const resultContainer = document.querySelector("#container-result-pop-up");
+			const responseWas = document.querySelector(".response-was-container");
+			const responseWasTitle = responseWas.querySelector("h2:last-of-type");
 
 			if (!hangManBodyPart[1]) {
 				resultTitle.classList.remove("multicolortext");
 				resultTitle.style.color = "rgb(235 96 96)";
-				resultTitle.innerText = "You lost !";
-				// resultTitle.classList.add();
+				resultTitle.innerHTML = `Perdu!`;
+				responseWas.classList.remove("d-none");
+				responseWasTitle.innerText = word;
+
 				resultContainer.style.display = "flex";
 			}
 
@@ -687,7 +706,7 @@
 				previousChoiceCount++;
 				if (!(validationResponse = verifyLetterChoice(choiceInput, word.letters))) {
 					displayInvalidChoice();
-					handleInvalidChoice();
+					handleInvalidChoice(word.word);
 				} else {
 					const isDone = verifyIfGameDone(validationResponse.length);
 					if (isDone === word.length) {
