@@ -278,7 +278,7 @@
 				backdrop-filter: blur(1.5px);
 				-webkit-backdrop-filter: blur(1.5px);
 				left: 50%;
-				transform: translate(-50%, 50%);
+				transform: translate(-50%, 70%);
 				height: 510px;
 				display: none;
 				justify-content: center;
@@ -292,6 +292,16 @@
 			.response-was-container {
 				width: 100%;
 				text-align: center;
+			}
+
+			.response-text {
+				padding: 5px 10px;
+				background: rgb(107 211 161 / 90%);
+				display: inline-block;
+				position: relative;
+				border-radius: 10px;
+				z-index: 999;
+				color: white;
 			}
 
 			@keyframes hm-head-height {
@@ -375,7 +385,7 @@
 			<h1>Hangman</h1>
 			<div class="d-none response-was-container">
 				<h2 class="response-color">The response was:</h2>
-				<h2 class="response-color"></h2>
+				<h2 class="response-color response-text"></h2>
 			</div>
 
 			<div>
