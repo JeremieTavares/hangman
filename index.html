@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=no" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/tsparticles/2.12.0/tsparticles.bundle.min.js"></script>
+		<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+		<link rel="canonical" href="https://jeremietavares.github.io/hangman/" />
+		<link rel="manifest" href="/tictactoe//manifest.webmanifest" />
+		<title>Hang Man</title>
+	</head>
+	<body>
+		<style>
+			* {
+				font-family: sans-serif;
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+				overflow: -moz-scrollbars-horizontal;
+				overflow-y: hidden;
+				-webkit-touch-callout: none; /* iOS Safari */
+				-webkit-user-select: none; /* Safari, Chrome, Opera, Samsung */
+				-khtml-user-select: none; /* Konqueror HTML */
+				-moz-user-select: none; /* Firefox */
+				-ms-user-select: none; /* Edge, IE */
+				user-select: none; /* Modern browsers */
+				-webkit-tap-highlight-color: rgba(
+					0,
+					0,
+					0,
+					0
+				); /* remove grey background on link clicked in ios safari / chrome / firefox */
+			}
+
+			body {
+				margin: 0;
+				padding: 0;
+				font-family: sans-serif;
+				background-color: rgb(97, 248, 178);
+			}
+
+			section {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				height: 100vh;
+			}
+
+			/* Applied via JS to remove the scroll in PWA mode */
+			.fixed-body {
+				position: fixed !important;
+				left: 0 !important;
+				top: 0 !important;
+				right: 0 !important;
+				bottom: 0 !important;
+			}
+
+			h1 {
+				color: rgb(230, 255, 243);
+				font-size: clamp(50px, 15vw, 80px);
+				margin-top: 50px;
+			}
+
+			.container {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				padding: 20px;
+				width: 100%;
+			}
+
+			.game-container {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 100%;
+			}
+
+			.case {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				min-width: 20px;
+				width: 10vw;
+				max-width: 50px;
+				height: 50px;
+				border-bottom: 5px solid rgba(6, 59, 33, 0.754);
+				margin: 5px;
+				font-size: 3em;
+			}
+
+			.letter-choice {
+				all: unset;
+				width: 60px;
+				height: 70px;
+				border: 1px solid rgb(202 202 202 / 36%);
+				font-size: 3em;
+				border-radius: 8px;
+				margin-top: 30px;
+				text-align: center;
+				background: #ffffff7d;
+				backdrop-filter: blur(2px);
+			}
+
+			.is-valid {
+				color: #52bd52;
+				/* border: 1px solid #80ed80;
+             box-shadow: 0px 0px 5px 1px #97da97; */
+				transition: all 0.3s ease;
+			}
+
+			.is-invalid {
+				color: #ff4a4a;
+				transition: all 0.3s ease-out;
+				animation: shake 0.3s;
+			}
+			.btn-try-again {
+				margin-top: 35px;
+				padding: 10px 20px;
+				border-radius: 10px;
+				border: none;
+				background-color: rgba(7, 84, 47, 0.754);
+				color: rgb(230, 255, 243);
+				font-size: 1.5rem;
+				cursor: pointer;
+				transition: background-color 0.2s, scale 0.3s;
+				margin-bottom: 80px;
+			}
+
+			.btn-try-again:hover {
+				background-color: rgba(7, 84, 47, 0.9);
+				scale: 0.98;
+			}
+
+			.choice-container {
+				position: relative;
+				overflow: hidden;
+			}
+
+			.choice-container lottie-player {
+				width: 120px;
+				height: 120px;
+				position: absolute;
+				top: 5px;
+				right: -27px;
+			}
+
+			.hangman-container {
+				overflow-y: initial;
+				position: relative;
+				margin-bottom: 20px;
+			}
+			.hangman-container svg {
+				filter: invert(96%);
+			}
+
+			.head {
+				position: absolute;
+				background: #ff8ad8;
+				border-radius: 50%;
+				top: 8%;
+				right: -21px;
+				width: 50px;
+				height: 50px;
+				z-index: 1;
+				animation: hm-head-height 0.7s;
+			}
+
+			.body {
+				position: absolute;
+				background: #ff8ad8;
+				top: 25.5%;
+				right: -1px;
+				width: 8px;
+				height: 100px;
+				z-index: -1;
+				animation: hm-body-height 0.7s;
+			}
+
+			.arm-l {
+				position: absolute;
+				background: #ff8ad8;
+				top: 27.5%;
+				right: -20px;
+				width: 7px;
+				height: 50px;
+				z-index: -1;
+				rotate: 133deg;
+				animation: hm-arm-height 0.7s;
+			}
+
+			.arm-r {
+				position: absolute;
+				background: #ff8ad8;
+				top: 28.2%;
+				width: 7px;
+				right: 16px;
+				height: 50px;
+				z-index: -1;
+				rotate: 39deg;
+				animation: hm-arm-height 0.7s;
+			}
+
+			.leg-l {
+				position: absolute;
+				background: #ff8ad8;
+				top: 57%;
+				right: -20px;
+				width: 7px;
+				height: 70px;
+				z-index: -1;
+				rotate: 148deg;
+				animation: hm-leg-height 0.7s;
+			}
+
+			.leg-r {
+				position: absolute;
+				background: #ff8ad8;
+				top: 57%;
+				width: 7px;
+				right: 16px;
+				height: 70px;
+				z-index: -1;
+				rotate: 27deg;
+				animation: hm-leg-height 0.7s;
+			}
+
+			.d-none {
+				display: none;
+			}
+
+			#result-pop-up {
+				font-size: clamp(5rem, 15vw, 7rem);
+				text-align: center;
+				width: 100%;
+				position: absolute;
+				top: 7%;
+				left: 50%;
+				transform: translate(-50%, 50%);
+				z-index: 99;
+				animation: wowgg 0.55s ease;
+			}
+
+			@keyframes wowgg {
+				from {
+					transform: translate(-50%, 50%) scale(0);
+				}
+
+				60% {
+					transform: translate(-50%, 50%) scale(1.16);
+				}
+				75% {
+					transform: translate(-50%, 50%) scale(0.99);
+				}
+				90% {
+					transform: translate(-50%, 50%) scale(1.02);
+				}
+				to {
+					transform: translate(-50%, 50%) scale(1);
+				}
+			}
+
+			.multicolortext {
+				background-image: linear-gradient(to left, rgb(247, 247, 49), rgb(247, 253, 78));
+				-webkit-background-clip: text;
+				-moz-background-clip: text;
+				background-clip: text;
+				color: transparent;
+				text-shadow: 2px 2px 2px rgba(255, 255, 255, 0.273);
+			}
+
+			.container-result-pop-up {
+				text-align: center;
+				width: 100%;
+				position: absolute;
+				z-index: 1000;
+				backdrop-filter: blur(1.5px);
+				-webkit-backdrop-filter: blur(1.5px);
+				left: 50%;
+				transform: translate(-50%, 50%);
+				height: 510px;
+				display: none;
+				justify-content: center;
+				align-items: center;
+			}
+
+			@keyframes hm-head-height {
+				from {
+					height: 0px;
+					transform: scale(0);
+				}
+				to {
+					height: 50px;
+					transform: scale(1);
+				}
+			}
+
+			@keyframes hm-body-height {
+				from {
+					height: 0px;
+					transform: scale(0);
+				}
+				to {
+					height: 100px;
+					transform: scale(1);
+				}
+			}
+
+			@keyframes hm-arm-height {
+				from {
+					height: 0px;
+					transform: scale(0);
+				}
+				to {
+					height: 50px;
+					transform: scale(1);
+				}
+			}
+
+			@keyframes hm-leg-height {
+				from {
+					height: 0px;
+					transform: scale(0);
+				}
+				to {
+					height: 70px;
+					transform: scale(1);
+				}
+			}
+
+			@keyframes shake {
+				0% {
+					transform: translateX(0);
+				}
+				25% {
+					transform: translateX(-10px);
+				}
+				50% {
+					transform: translateX(10px);
+				}
+				75% {
+					transform: translateX(-10px);
+				}
+				100% {
+					transform: translateX(0);
+				}
+			}
+
+			@media (max-width: 500px) {
+				h1 {
+					margin-top: 20px;
+				}
+
+				.btn-try-again {
+					margin-bottom: 20px;
+				}
+			}
+		</style>
+		<div id="tsparticles"></div>
+
+		<div class="container-result-pop-up" id="container-result-pop-up">
+			<h2 id="result-pop-up" class="multicolortext"></h2>
+		</div>
+		<section>
+			<h1>Hangman</h1>
+			<div>
+				<button type="button" class="btn-try-again" id="btn-try-again">Next Word</button>
+			</div>
+			<div class="container">
+				<!-- Draw in JS using css class -->
+				<div class="hangman-container">
+					<svg width="195" height="281" viewBox="0 0 195 281" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path
+							d="M0.997085 276.716L58.2096 276.901M191.309 25L191.309 7.54263C191.309 5.33703 189.523 3.54763 187.318 3.54265L61.7539 3.25866C59.5385 3.25365 57.741 5.05016 57.7448 7.26553L58.2096 276.901M127 277.122L58.2096 276.901"
+							stroke="black"
+							stroke-width="6" />
+					</svg>
+
+					<span class="head d-none"></span>
+					<span class="body d-none"></span>
+					<span class="arm-l d-none"></span>
+					<span class="arm-r d-none"></span>
+					<span class="leg-l d-none"></span>
+					<span class="leg-r d-none"></span>
+				</div>
+				<!-- Populated in JS -->
+				<div class="game-container"></div>
+				<div class="choice-container">
+					<input type="text" name="letter" class="letter-choice" id="letter-choice" maxlength="1" />
+					<lottie-player
+						src="https://lottie.host/0c66bb39-6b1b-42d2-b4e3-884664c11757/9J13IynRXs.json"
+						background="transparent"
+						speed="1"
+						style="width: 120px; height: 120px"
+						loop
+						direction="1"
+						autoplay
+						mode="normal"></lottie-player>
+				</div>
+			</div>
+		</section>
+	</body>
+
+	<script>
+		const generateWord = () => {
+			const wordList = [
+				"elephant",
+				"pomme",
+				// "avion",
+				// "bateau",
+				// "enfant",
+				// "voiture",
+				// "complotiste",
+				// "recette",
+				// "voyage",
+				// "programmation",
+				// "quantique",
+				// "ordinateur",
+				// "souris",
+				// "clavier",
+				// "tablette",
+				// "smartphone",
+				// "chaise",
+				// "table",
+				// "bureau",
+				// "maison",
+				// "appartement",
+				// "immeuble",
+				// "piscine",
+				// "jardin",
+				// "parc",
+				// "foret",
+				// "montagne",
+				// "mer",
+				// "océan",
+				"lac",
+				// "rivière",
+				// "pont",
+				// "route",
+				// "autoroute",
+				// "chemin",
+				// "rue",
+				// "avenue",
+				// "boulevard",
+				// "impasse",
+				// "cours",
+				// "cave",
+				// "grenier",
+				// "toit",
+				// "mur",
+				// "plafond",
+				// "sol",
+				// "escalier",
+				// "ascenseur",
+				// "porte",
+				// "volet",
+			];
+
+			const randomWord = wordList[Math.floor(Math.random() * wordList.length)];
+
+			const wordObj = {
+				word: randomWord,
+				length: randomWord.length,
+				letters: randomWord.split(""),
+			};
+
+			return wordObj;
+		};
+
+		const generateCases = (wordLength) => {
+			const gameContainer = document.querySelector(".game-container");
+			gameContainer.innerHTML = "";
+			for (let i = 0; i < wordLength; i++) {
+				const span = document.createElement("span");
+				span.classList.add("case");
+				span.setAttribute("data-index", i);
+				gameContainer.appendChild(span);
+			}
+		};
+
+		const verifyLetterChoice = (choice, generatedWord) => {
+			if (choice.length > 1) {
+				alert("Vous ne pouvez choisir qu'une seule lettre");
+				choice.value = "";
+				return false;
+			}
+
+			const choiceIndices = generatedWord.reduce((indices, word, index) => {
+				if (word === choice.value) {
+					indices.push({ letter: word, index: index });
+				}
+				return indices;
+			}, []);
+
+			return choiceIndices.length === 0 ? false : choiceIndices;
+		};
+
+		const displayValidChoice = (choices) => {
+			const gameContainer = document.querySelector(".game-container");
+			const choiceInput = document.querySelector("#letter-choice");
+			const cases = document.querySelector(".case");
+
+			choices.forEach((choice) => {
+				const singleCase = document.querySelector(`.case[data-index='${choice.index}']`);
+				if (singleCase) {
+					choiceInput.classList.add("is-valid");
+
+					setTimeout(() => {
+						choiceInput.classList.remove("is-valid");
+						choiceInput.value = "";
+						singleCase.textContent = choice.letter;
+					}, 300);
+				}
+			});
+		};
+
+		const displayInvalidChoice = () => {
+			const choiceInput = document.querySelector("#letter-choice");
+			choiceInput.classList.add("is-invalid");
+			setTimeout(() => {
+				choiceInput.classList.remove("is-invalid");
+				choiceInput.value = "";
+			}, 500);
+		};
+
+		const handleInvalidChoice = () => {
+			const hangManBodyPart = document.querySelectorAll(".hangman-container span.d-none");
+			const resultTitle = document.querySelector("#result-pop-up");
+			const resultContainer = document.querySelector("#container-result-pop-up");
+
+			if (!hangManBodyPart[1]) {
+				resultTitle.classList.remove("multicolortext");
+				resultTitle.style.color = "rgb(235 96 96)";
+				resultTitle.innerText = "You lost !";
+				// resultTitle.classList.add();
+				resultContainer.style.display = "flex";
+			}
+
+			hangManBodyPart[0].classList.remove("d-none");
+		};
+
+		const isAllLetterFound = () => {
+			let countLetterFound = 0;
+			const counter = (letterFound) => {
+				countLetterFound += letterFound;
+				return countLetterFound;
+			};
+
+			counter.reset = () => {
+				countLetterFound = 0;
+			};
+			return counter;
+		};
+
+		const isAPreviousChoice = () => {
+			let previousChoosedLetter = [];
+			const choosedLetterArray = (choice) => {
+				if (!choice) return false;
+				if (!previousChoosedLetter.includes(choice)) previousChoosedLetter.push(choice);
+
+				return previousChoosedLetter;
+			};
+
+			choosedLetterArray.reset = () => {
+				previousChoosedLetter = [];
+			};
+			return choosedLetterArray;
+		};
+
+		const onClickResetGame = (callback) => {
+			const resetBtn = document.querySelector(".btn-try-again");
+
+			resetBtn.addEventListener("click", (e) => {
+				window.location.reload();
+				return;
+				// e.stopImmediatePropagation();
+				// if (typeof callback === "function") callback();
+				// const gameContainer = document.querySelector(".game-container");
+				// const choiceInput = document.querySelector("#letter-choice");
+				// const hangManBodyPart = document.querySelectorAll(".hangman-container span");
+				// const cases = document.querySelectorAll(".case");
+				// gameContainer.innerHTML = "";
+				// choiceInput.value = "";
+				// hangManBodyPart.forEach((part) => part.classList.add("d-none"));
+				// cases.forEach((singleCase) => singleCase.remove());
+
+				// setTimeout(() => {
+				// 	main();
+				// }, 1000);
+			});
+		};
+
+		const main = () => {
+			const word = generateWord();
+			generateCases(word.length);
+			const verifyIfGameDone = isAllLetterFound(word.length);
+			const wasChosenBefore = isAPreviousChoice();
+			let previousChoiceCount = 0;
+			const choiceInput = document.querySelector("#letter-choice");
+			const lottieClickAnimation = document.querySelector("lottie-player");
+
+			const resultTitle = document.querySelector("#result-pop-up");
+			const resultContainer = document.querySelector("#container-result-pop-up");
+			onClickResetGame(() => {
+				verifyIfGameDone.reset();
+				wasChosenBefore.reset();
+			});
+
+			choiceInput.addEventListener("blur", (e) => {
+				e.stopImmediatePropagation();
+				lottieClickAnimation.classList.remove("d-none");
+			});
+
+			lottieClickAnimation.addEventListener("click", () => {
+				choiceInput.focus();
+				lottieClickAnimation.classList.add("d-none");
+			});
+
+			choiceInput.addEventListener("input", (e) => {
+				e.stopImmediatePropagation();
+				if ((chosenBefore = wasChosenBefore(choiceInput.value).length === previousChoiceCount)) {
+					displayInvalidChoice();
+					return;
+				}
+
+				previousChoiceCount++;
+				if (!(validationResponse = verifyLetterChoice(choiceInput, word.letters))) {
+					displayInvalidChoice();
+					handleInvalidChoice();
+				} else {
+					const isDone = verifyIfGameDone(validationResponse.length);
+					if (isDone === word.length) {
+						displayValidChoice(validationResponse);
+						// verifyIfGameDone.reset();
+						// wasChosenBefore.reset();
+
+						particles.reset();
+						resultTitle.innerText = "You win !";
+						resultContainer.style.display = "flex";
+					} else {
+						displayValidChoice(validationResponse);
+					}
+				}
+			});
+		};
+
+		main();
+
+		tsParticles
+			.load("tsparticles", {
+				fullScreen: {
+					zIndex: 1001,
+				},
+				particles: {
+					number: {
+						value: 0,
+					},
+					color: {
+						value: ["#00FFFC", "#FC00FF", "#fffc00"],
+					},
+					shape: {
+						type: ["circle", "square", "triangle", "polygon"],
+						options: {
+							polygon: [
+								{
+									sides: 5,
+								},
+								{
+									sides: 6,
+								},
+							],
+						},
+					},
+					opacity: {
+						value: 1,
+						animation: {
+							enable: true,
+							minimumValue: 0,
+							speed: 2,
+							startValue: "max",
+							destroy: "min",
+						},
+					},
+					size: {
+						value: 5,
+						random: {
+							enable: true,
+							minimumValue: 2,
+						},
+					},
+					links: {
+						enable: false,
+					},
+					life: {
+						duration: {
+							sync: true,
+							value: 5,
+						},
+						count: 1,
+					},
+					move: {
+						enable: true,
+						gravity: {
+							enable: true,
+							acceleration: 10,
+						},
+						speed: {
+							min: 10,
+							max: 20,
+						},
+						decay: 0.1,
+						direction: "none",
+						straight: false,
+						outModes: {
+							default: "destroy",
+							top: "none",
+						},
+					},
+					rotate: {
+						value: {
+							min: 0,
+							max: 360,
+						},
+						direction: "random",
+						move: true,
+						animation: {
+							enable: true,
+							speed: 60,
+						},
+					},
+					tilt: {
+						direction: "random",
+						enable: true,
+						move: true,
+						value: {
+							min: 0,
+							max: 360,
+						},
+						animation: {
+							enable: true,
+							speed: 60,
+						},
+					},
+					roll: {
+						darken: {
+							enable: true,
+							value: 25,
+						},
+						enable: true,
+						speed: {
+							min: 15,
+							max: 25,
+						},
+					},
+					wobble: {
+						distance: 30,
+						enable: true,
+						move: true,
+						speed: {
+							min: -15,
+							max: 15,
+						},
+					},
+				},
+				emitters: {
+					life: {
+						count: 0,
+						duration: 0.1,
+						delay: 0.6,
+					},
+					rate: {
+						delay: 0.1,
+						quantity: 125,
+					},
+					size: {
+						width: 0,
+						height: 0,
+					},
+				},
+			})
+			.then((container) => {
+				particles.stop();
+				console.log("callback - tsparticles config loaded");
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+		const particles = tsParticles.domItem(0);
+
+		// If user is in PWA mode, remove the scroll ability
+		if (window.matchMedia("(display-mode: standalone)").matches) {
+			window.addEventListener("scroll", (e) => {
+				e.preventDefault();
+				window.scrollTo(0, 0);
+			});
+
+			const body = document.querySelector("body");
+			body.classList.add("fixed-body");
+		}
+	</script>
+</html>

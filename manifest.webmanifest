@@ -1,0 +1,17 @@
+{
+	"name": "Hangman",
+	"short_name": "Hangman",
+	"description": "Simple Hangman Game!",
+	"icons": [
+		{
+			"src": "output-onlinepngtools.png",
+			"sizes": "192x192",
+			"type": "image/png"
+		}
+	],
+	"start_url": "/hangman",
+	"scope": "/hangman/",
+	"background_color": "rgb(97, 248, 178)",
+	"theme_color": "rgb(97, 248, 178)",
+	"display": "standalone"
+}
